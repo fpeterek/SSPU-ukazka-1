@@ -4,7 +4,7 @@
 
 
 float momentumDecrease(float orig) {
-    constexpr float decelerationFactor = 15.f;
+    constexpr float decelerationFactor = 30.f;
     return std::abs(orig) / decelerationFactor * (orig < 0.f ? -1.f : 1.f);
 }
 
@@ -17,6 +17,7 @@ int main() {
     // Init constants
     constexpr float velocity = 2.f;
     constexpr float rotateAcceleration = 0.1f;
+    constexpr float maxRotateVelocity = 10.f;
     const sf::Color orig = sf::Color::White;
     const sf::Color hover = sf::Color::Black;
     const sf::Color background = sf::Color(200, 100, 100);
@@ -70,12 +71,19 @@ int main() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
             rotateMomentum -= rotateAcceleration;
-            momentumChanged = true;
+            if (rotateMomentum < 0.f) {
+                momentumChanged = true;
+            }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
             rotateMomentum += rotateAcceleration;
-            momentumChanged = true;
+            if (rotateMomentum > 0.f) {
+                momentumChanged = true;
+            }  
         }
+
+        rotateMomentum = std::min(rotateMomentum, maxRotateVelocity);
+        rotateMomentum = std::max(rotateMomentum, -maxRotateVelocity);
 
         // Handle rotation
         if (not momentumChanged) {
