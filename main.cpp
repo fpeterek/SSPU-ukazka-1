@@ -28,7 +28,7 @@ int main() {
     // Init rect
     sf::RectangleShape rect(sf::Vector2f(50, 50));
     float rotateMomentum = 0;
-    bool momentumChanged = false;
+    bool shouldSlowDown = true;
     rect.setOrigin(25, 25);
     rect.setScale(scale, scale);
     rect.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
@@ -71,28 +71,24 @@ int main() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
             rotateMomentum -= rotateAcceleration;
-            if (rotateMomentum < 0.f) {
-                momentumChanged = true;
-            }
+            shouldSlowDown = not (rotateMomentum < 0.f);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
             rotateMomentum += rotateAcceleration;
-            if (rotateMomentum > 0.f) {
-                momentumChanged = true;
-            }  
+            shouldSlowDown = not (rotateMomentum > 0.f);
         }
 
         rotateMomentum = std::min(rotateMomentum, maxRotateVelocity);
         rotateMomentum = std::max(rotateMomentum, -maxRotateVelocity);
 
         // Handle rotation
-        if (not momentumChanged) {
+        if (shouldSlowDown) {
             rotateMomentum -= momentumDecrease(rotateMomentum);
         }
         if (std::abs(rotateMomentum) < 0.05f) {
             rotateMomentum = 0.f;
         }
-        momentumChanged = false;
+        shouldSlowDown = true;
         rect.rotate(rotateMomentum);
 
         // Check if mouse cursor is hovering over rect
